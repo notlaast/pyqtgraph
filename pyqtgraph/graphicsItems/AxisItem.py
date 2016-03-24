@@ -674,8 +674,8 @@ class AxisItem(GraphicsWidget):
         minVal, maxVal = sorted((minVal, maxVal))
         
 
-        minVal *= self.scale  
-        maxVal *= self.scale
+#        minVal *= self.scale # JCL: removed self.scale
+#        maxVal *= self.scale
         #size *= self.scale
             
         ticks = []
@@ -689,13 +689,15 @@ class AxisItem(GraphicsWidget):
             
             ## determine number of ticks
             num = int((maxVal-start) / spacing) + 1
-            values = (np.arange(num) * spacing + start) / self.scale
+#            values = (np.arange(num) * spacing + start) / self.scale
+            values = (np.arange(num) * spacing + start) # JCL: removed self.scale
             ## remove any ticks that were present in higher levels
             ## we assume here that if the difference between a tick value and a previously seen tick value
             ## is less than spacing/100, then they are 'equal' and we can ignore the new tick.
             values = list(filter(lambda x: all(np.abs(allValues-x) > spacing*0.01), values) )
             allValues = np.concatenate([allValues, values])
-            ticks.append((spacing/self.scale, values))
+#            ticks.append((spacing/self.scale, values))
+            ticks.append((spacing, values)) # JCL: removed self.scale
             
         if self.logMode:
             return self.logTickValues(minVal, maxVal, size, ticks)
