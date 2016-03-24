@@ -200,6 +200,7 @@ from .graphicsItems.GridItem import *
 from .graphicsItems.GradientLegend import * 
 from .graphicsItems.GraphicsItem import * 
 from .graphicsItems.BarGraphItem import * 
+from .graphicsItems.StickPlotItem import * 
 from .graphicsItems.ViewBox import * 
 from .graphicsItems.ArrowItem import * 
 from .graphicsItems.ImageItem import * 
