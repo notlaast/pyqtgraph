@@ -46,6 +46,7 @@ class StickPlotItem(GraphicsObject):
             pen=None,
             pens=None,
         )
+        self.boundingCorners = [0, 0, 0, 0]
         self.picture = None
         self.setOpts(**opts)
     
@@ -85,6 +86,14 @@ class StickPlotItem(GraphicsObject):
         elif (y0 is None) and (y1 is None):
             raise Exception('You must specify x and one of these combinations: (y & height), (only height), or (y0 and y1).')
         
+        self.boundingCorners = [0, 0, 0, 0]
+        if (len(x) > 0):
+            self.boundingCorners[0] = x.min()
+            self.boundingCorners[0] = x.max()
+        if (len(x) > 0):
+            self.boundingCorners[1] = y0.min()
+            self.boundingCorners[3] = y1.max()
+        
         p.setPen(fn.mkPen(pen))
         for i in range(len(x)):
             if pens is not None:
@@ -113,11 +122,6 @@ class StickPlotItem(GraphicsObject):
         if self.picture is None:
             self.drawPicture()
         self.picture.play(p)
-    
-    def boundingRect(self):
-        if self.picture is None:
-            self.drawPicture()
-        return QtCore.QRectF(self.picture.boundingRect())
     
     def shape(self):
         if self.picture is None:
@@ -170,3 +174,19 @@ class StickPlotItem(GraphicsObject):
         PlotItem.
         """
         return self.opts.get('name')
+            
+    def boundingRect(self):
+        """
+        Returns a QRectF based on the bounding corners that are updated
+        within drawPicture(). Note that this differs significantly from
+        BarGraphItem, because it was found that very small ranges in the
+        y-data round up to [0..1].
+        """
+        if self.picture is None:
+            self.drawPicture()
+        return QtCore.QRectF(
+            self.boundingCorners[0],
+            self.boundingCorners[1],
+            self.boundingCorners[2],
+            self.boundingCorners[3]
+        )
