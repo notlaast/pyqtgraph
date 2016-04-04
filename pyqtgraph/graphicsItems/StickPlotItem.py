@@ -83,16 +83,21 @@ class StickPlotItem(GraphicsObject):
         elif (y is None) and (height is not None):
             y0 = 0
             y1 = height
-        elif (y0 is None) and (y1 is None):
+        elif (y0 is None) or (y1 is None):
             raise Exception('You must specify x and one of these combinations: (y & height), (only height), or (y0 and y1).')
         
         self.boundingCorners = [0, 0, 0, 0]
         if (len(x) > 0):
             self.boundingCorners[0] = x.min()
-            self.boundingCorners[0] = x.max()
-        if (len(x) > 0):
-            self.boundingCorners[1] = y0.min()
-            self.boundingCorners[3] = y1.max()
+            self.boundingCorners[2] = x.max()
+        if np.isscalar(y0):
+            self.boundingCorners[1] = y0
+        elif (len(y0) > 0):
+           self.boundingCorners[1] = y0.min()
+        if np.isscalar(y1):
+            self.boundingCorners[3] = y1
+        elif (len(y1) > 0):
+           self.boundingCorners[3] = y1.max()
         
         p.setPen(fn.mkPen(pen))
         for i in range(len(x)):
@@ -123,11 +128,6 @@ class StickPlotItem(GraphicsObject):
             self.drawPicture()
         self.picture.play(p)
     
-    def shape(self):
-        if self.picture is None:
-            self.drawPicture()
-        return self._shape
-    
     def setData(self, *args, **kargs):
         """
         Clears any data displayed by this item and displays new data.
@@ -135,7 +135,6 @@ class StickPlotItem(GraphicsObject):
         Note that this was taken directly from the PyQtGraph API code.
         See :func:`__init__() <pyqtgraph.PlotDataItem.__init__>` for details; it accepts the same arguments.
         """
-        name = None
         x = None
         y = None
         y0 = None
@@ -154,10 +153,11 @@ class StickPlotItem(GraphicsObject):
         if 'height' in kargs:
             height = kargs['height']
         if 'pen' in kargs:
-            height = kargs['pen']
+            pen = kargs['pen']
+        if 'pens' in kargs:
+            pens = kargs['pens']
         
         opts = dict(
-            name=name,
             x=x,
             y=y,
             y0=y0,
@@ -187,6 +187,6 @@ class StickPlotItem(GraphicsObject):
         return QtCore.QRectF(
             self.boundingCorners[0],
             self.boundingCorners[1],
-            self.boundingCorners[2],
-            self.boundingCorners[3]
+            self.boundingCorners[2]-self.boundingCorners[0],
+            self.boundingCorners[3]-self.boundingCorners[1]
         )
